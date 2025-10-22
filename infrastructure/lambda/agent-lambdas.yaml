@@ -1,0 +1,383 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'SocratIQ Multi-Agent Collaboration System - Domain Agent Lambda Functions'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: prod
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+    Description: Environment name
+
+  BedrockModelId:
+    Type: String
+    Default: 'anthropic.claude-3-5-sonnet-20241022-v2:0'
+    Description: AWS Bedrock model ID for Claude 3.5 Sonnet
+
+  DBSecretArn:
+    Type: String
+    Default: 'arn:aws:secretsmanager:us-east-1:797455229240:secret:socratiq/db/credentials-4w7uQA'
+    Description: ARN of database credentials secret
+
+Resources:
+  # IAM Role for Domain Agents (VERA, FINN, NORA, CLIA)
+  DomainAgentExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'SocratIQ-DomainAgent-ExecutionRole-${Environment}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      Policies:
+        - PolicyName: BedrockAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                  - bedrock:InvokeModelWithResponseStream
+                Resource: !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/*'
+        - PolicyName: S3CorpusAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub 'arn:aws:s3:::socratiq-vera-corpus-${Environment}'
+                  - !Sub 'arn:aws:s3:::socratiq-vera-corpus-${Environment}/*'
+                  - !Sub 'arn:aws:s3:::socratiq-finn-corpus-${Environment}'
+                  - !Sub 'arn:aws:s3:::socratiq-finn-corpus-${Environment}/*'
+                  - !Sub 'arn:aws:s3:::socratiq-nora-corpus-${Environment}'
+                  - !Sub 'arn:aws:s3:::socratiq-nora-corpus-${Environment}/*'
+                  - !Sub 'arn:aws:s3:::socratiq-clia-corpus-${Environment}'
+                  - !Sub 'arn:aws:s3:::socratiq-clia-corpus-${Environment}/*'
+
+  # IAM Role for Sophie Orchestrator
+  SophieOrchestratorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'SocratIQ-Sophie-ExecutionRole-${Environment}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      Policies:
+        - PolicyName: InvokeAgentLambdas
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - !GetAtt VERAAgentFunction.Arn
+                  - !GetAtt FINNAgentFunction.Arn
+                  - !GetAtt NORAAgentFunction.Arn
+                  - !GetAtt CLIAAgentFunction.Arn
+        - PolicyName: BedrockAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                  - bedrock:InvokeModelWithResponseStream
+                Resource: !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/*'
+        - PolicyName: SecretsManagerAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Ref DBSecretArn
+        - PolicyName: S3SophieCorpusAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub 'arn:aws:s3:::socratiq-sophie-corpus-${Environment}'
+                  - !Sub 'arn:aws:s3:::socratiq-sophie-corpus-${Environment}/*'
+
+  # Lambda Layer for Shared Dependencies
+  AgentSharedLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      LayerName: !Sub 'socratiq-agent-shared-${Environment}'
+      Description: Shared utilities for SocratIQ agents (AWS SDK v3, corpus retrieval, Bedrock client)
+      CompatibleRuntimes:
+        - nodejs20.x
+      Content:
+        S3Bucket: !Sub 'socratiq-lambda-code-${Environment}'
+        S3Key: 'layers/agent-shared-layer.zip'
+
+  # VERA Agent Lambda Function
+  VERAAgentFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'SocratIQ-VERA-Agent-${Environment}'
+      Description: VERA - Product & Clinical Intelligence Agent
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Role: !GetAtt DomainAgentExecutionRole.Arn
+      Timeout: 180
+      MemorySize: 1024
+      Layers:
+        - !Ref AgentSharedLayer
+      Environment:
+        Variables:
+          AGENT_NAME: VERA
+          CORPUS_BUCKET: !Sub 'socratiq-vera-corpus-${Environment}'
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+          REGION: !Ref AWS::Region
+          ENVIRONMENT: !Ref Environment
+      Code:
+        S3Bucket: !Sub 'socratiq-lambda-code-${Environment}'
+        S3Key: 'agents/vera-agent.zip'
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-079019dddda2c3b3a
+        SubnetIds:
+          - subnet-077cc788ec4a6a7fe
+          - subnet-08c8e7b914ab19438
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Agent
+          Value: VERA
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # FINN Agent Lambda Function
+  FINNAgentFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'SocratIQ-FINN-Agent-${Environment}'
+      Description: FINN - Financial & Investment Intelligence Agent
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Role: !GetAtt DomainAgentExecutionRole.Arn
+      Timeout: 180
+      MemorySize: 1024
+      Layers:
+        - !Ref AgentSharedLayer
+      Environment:
+        Variables:
+          AGENT_NAME: FINN
+          CORPUS_BUCKET: !Sub 'socratiq-finn-corpus-${Environment}'
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+          REGION: !Ref AWS::Region
+          ENVIRONMENT: !Ref Environment
+      Code:
+        S3Bucket: !Sub 'socratiq-lambda-code-${Environment}'
+        S3Key: 'agents/finn-agent.zip'
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-079019dddda2c3b3a
+        SubnetIds:
+          - subnet-077cc788ec4a6a7fe
+          - subnet-08c8e7b914ab19438
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Agent
+          Value: FINN
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # NORA Agent Lambda Function
+  NORAAgentFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'SocratIQ-NORA-Agent-${Environment}'
+      Description: NORA - Legal Regulatory and IP Intelligence Agent
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Role: !GetAtt DomainAgentExecutionRole.Arn
+      Timeout: 180
+      MemorySize: 1024
+      Layers:
+        - !Ref AgentSharedLayer
+      Environment:
+        Variables:
+          AGENT_NAME: NORA
+          CORPUS_BUCKET: !Sub 'socratiq-nora-corpus-${Environment}'
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+          REGION: !Ref AWS::Region
+          ENVIRONMENT: !Ref Environment
+      Code:
+        S3Bucket: !Sub 'socratiq-lambda-code-${Environment}'
+        S3Key: 'agents/nora-agent.zip'
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-079019dddda2c3b3a
+        SubnetIds:
+          - subnet-077cc788ec4a6a7fe
+          - subnet-08c8e7b914ab19438
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Agent
+          Value: NORA
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # CLIA Agent Lambda Function
+  CLIAAgentFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'SocratIQ-CLIA-Agent-${Environment}'
+      Description: CLIA - Clinical Trials and Market Intelligence Agent
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Role: !GetAtt DomainAgentExecutionRole.Arn
+      Timeout: 180
+      MemorySize: 1024
+      Layers:
+        - !Ref AgentSharedLayer
+      Environment:
+        Variables:
+          AGENT_NAME: CLIA
+          CORPUS_BUCKET: !Sub 'socratiq-clia-corpus-${Environment}'
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+          REGION: !Ref AWS::Region
+          ENVIRONMENT: !Ref Environment
+      Code:
+        S3Bucket: !Sub 'socratiq-lambda-code-${Environment}'
+        S3Key: 'agents/clia-agent.zip'
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-079019dddda2c3b3a
+        SubnetIds:
+          - subnet-077cc788ec4a6a7fe
+          - subnet-08c8e7b914ab19438
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Agent
+          Value: CLIA
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # Sophie Orchestrator Lambda Function
+  SophieOrchestratorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'SocratIQ-Sophie-Orchestrator-${Environment}'
+      Description: Sophie - Strategic Orchestration Engine with Multi-Agent Coordination
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Role: !GetAtt SophieOrchestratorRole.Arn
+      Timeout: 300
+      MemorySize: 2048
+      Layers:
+        - !Ref AgentSharedLayer
+      Environment:
+        Variables:
+          AGENT_NAME: Sophie
+          VERA_LAMBDA_ARN: !GetAtt VERAAgentFunction.Arn
+          FINN_LAMBDA_ARN: !GetAtt FINNAgentFunction.Arn
+          NORA_LAMBDA_ARN: !GetAtt NORAAgentFunction.Arn
+          CLIA_LAMBDA_ARN: !GetAtt CLIAAgentFunction.Arn
+          CORPUS_BUCKET: !Sub 'socratiq-sophie-corpus-${Environment}'
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+          DB_SECRET_ARN: !Ref DBSecretArn
+          REGION: !Ref AWS::Region
+          ENVIRONMENT: !Ref Environment
+      Code:
+        S3Bucket: !Sub 'socratiq-lambda-code-${Environment}'
+        S3Key: 'agents/sophie-orchestrator.zip'
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-079019dddda2c3b3a
+        SubnetIds:
+          - subnet-077cc788ec4a6a7fe
+          - subnet-08c8e7b914ab19438
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Agent
+          Value: Sophie
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # API Gateway Integration (Update existing or create new)
+  AgentApiGatewayIntegration:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref SophieOrchestratorFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:8cwa0shan6/*/*'
+
+Outputs:
+  VERAAgentArn:
+    Description: VERA Agent Lambda Function ARN
+    Value: !GetAtt VERAAgentFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-VERA-Agent-Arn'
+
+  FINNAgentArn:
+    Description: FINN Agent Lambda Function ARN
+    Value: !GetAtt FINNAgentFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-FINN-Agent-Arn'
+
+  NORAAgentArn:
+    Description: NORA Agent Lambda Function ARN
+    Value: !GetAtt NORAAgentFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-NORA-Agent-Arn'
+
+  CLIAAgentArn:
+    Description: CLIA Agent Lambda Function ARN
+    Value: !GetAtt CLIAAgentFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-CLIA-Agent-Arn'
+
+  SophieOrchestratorArn:
+    Description: Sophie Orchestrator Lambda Function ARN
+    Value: !GetAtt SophieOrchestratorFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-Sophie-Orchestrator-Arn'
+
+  DomainAgentRoleArn:
+    Description: Domain Agent Execution Role ARN
+    Value: !GetAtt DomainAgentExecutionRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-DomainAgent-Role-Arn'
+
+  SophieOrchestratorRoleArn:
+    Description: Sophie Orchestrator Execution Role ARN
+    Value: !GetAtt SophieOrchestratorRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-Sophie-Role-Arn'
+
+  AgentSharedLayerArn:
+    Description: Shared Lambda Layer ARN
+    Value: !Ref AgentSharedLayer
+    Export:
+      Name: !Sub '${AWS::StackName}-Shared-Layer-Arn'

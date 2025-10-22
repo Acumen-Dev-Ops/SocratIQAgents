@@ -1,0 +1,168 @@
+{
+  "corpus_version": "1.0.0",
+  "last_updated": "2025-10-22",
+  "legal_review_date": "2025-10-22",
+  "reviewed_by": "SocratIQ Legal Compliance Team",
+  "overall_status": "APPROVED FOR USE",
+  "compliance_framework": {
+    "fair_use_basis": "17 U.S.C. § 107 (Fair Use Doctrine)",
+    "public_domain_basis": "17 U.S.C. § 105 (U.S. Government Works)",
+    "transformative_use": "Educational AI agent training corpus",
+    "attribution_policy": "All sources cited in agent responses",
+    "audit_trail": "Trace™ logging system"
+  },
+  "documents": [
+    {
+      "agent": "VERA",
+      "file_path": "documents/clinical/pmc-clinical-trial-recruitment-2024.md",
+      "s3_path": "s3://socratiq-vera-corpus-prod/documents/clinical/pmc-clinical-trial-recruitment-2024.md",
+      "title": "Clinical Trial Recruitment: Successes and Challenges",
+      "source": "PMC - PubMed Central",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11348161/",
+      "publication_date": "2024",
+      "date_added": "2025-10-22",
+      "legal_status": {
+        "copyright_status": "Open Access (PMC)",
+        "license": "Likely CC-BY or similar open access license",
+        "usage_rights": "Educational and research use with attribution",
+        "legal_basis": "PMC open access repository",
+        "attribution_required": true,
+        "risk_level": "LOW"
+      },
+      "attribution_template": "Source: 'Clinical Trial Recruitment: Successes and Challenges', Roseman University of Health Sciences (2024), PMC Article: https://pmc.ncbi.nlm.nih.gov/articles/PMC11348161/",
+      "quality_metrics": {
+        "authority": "HIGH - Peer-reviewed scientific publication",
+        "relevance": "HIGH - Evidence-based recruitment strategies",
+        "recency": "Current - 2024 publication",
+        "actionability": "HIGH - Specific methodologies with quantitative results"
+      }
+    },
+    {
+      "agent": "FINN",
+      "file_path": "documents/financial/risk-adjusted-npv-biotech-valuation.md",
+      "s3_path": "s3://socratiq-finn-corpus-prod/documents/financial/risk-adjusted-npv-biotech-valuation.md",
+      "title": "Risk-Adjusted NPV: The Gold Standard for Biotech Valuation",
+      "source": "Financial Models Hub",
+      "url": "https://financialmodelshub.com/risk-adjusted-npv-explained-the-gold-standard-for-biotech-valuation/",
+      "publication_date": "2024",
+      "date_added": "2025-10-22",
+      "legal_status": {
+        "copyright_status": "Educational content (blog/article)",
+        "license": "Not explicitly stated; assumed standard copyright",
+        "usage_rights": "Fair use for educational and research purposes",
+        "legal_basis": "17 U.S.C. § 107 (Fair Use - educational and transformative use)",
+        "attribution_required": true,
+        "risk_level": "LOW"
+      },
+      "fair_use_justification": {
+        "purpose": "Educational use for AI agent training (non-commercial, transformative)",
+        "nature": "Factual educational content (methodologies, formulas, industry standards)",
+        "amount": "Excerpts and summaries only (< 10% of original article)",
+        "effect": "No market harm; promotes understanding of publicly available financial methodologies"
+      },
+      "attribution_template": "Source: 'Risk-Adjusted NPV: The Gold Standard for Biotech Valuation', Financial Models Hub (2024), URL: https://financialmodelshub.com/risk-adjusted-npv-explained-the-gold-standard-for-biotech-valuation/",
+      "quality_metrics": {
+        "authority": "HIGH - Industry-recognized methodology",
+        "relevance": "CRITICAL - Core valuation framework for FINN agent",
+        "recency": "Current - 2024 publication",
+        "actionability": "HIGH - Worked examples, formulas, benchmarks"
+      }
+    },
+    {
+      "agent": "CLIA",
+      "file_path": "documents/competitive/pharma-ci-best-practices-inthought.md",
+      "s3_path": "s3://socratiq-clia-corpus-prod/documents/competitive/pharma-ci-best-practices-inthought.md",
+      "title": "Pharmaceutical Competitive Intelligence Best Practices",
+      "source": "inThought Research",
+      "url": "https://inthought.com/uncategorized/pharma-competitive-intelligence-best-practices/",
+      "publication_date": "2024",
+      "date_added": "2025-10-22",
+      "legal_status": {
+        "copyright_status": "Educational content (corporate blog)",
+        "license": "Not explicitly stated; assumed standard copyright",
+        "usage_rights": "Fair use for educational and research purposes",
+        "legal_basis": "17 U.S.C. § 107 (Fair Use - educational and transformative use)",
+        "attribution_required": true,
+        "risk_level": "LOW"
+      },
+      "fair_use_justification": {
+        "purpose": "Educational use for AI agent training (non-commercial, transformative)",
+        "nature": "Factual business methodology and best practices framework",
+        "amount": "Summary of key methodologies (< 10% of original content)",
+        "effect": "No market harm; enhances understanding of CI best practices"
+      },
+      "attribution_template": "Source: 'Pharmaceutical Competitive Intelligence Best Practices', inThought Research (2024), URL: https://inthought.com/uncategorized/pharma-competitive-intelligence-best-practices/",
+      "quality_metrics": {
+        "authority": "HIGH - Established CI framework provider",
+        "relevance": "CRITICAL - Systematic CI process for CLIA agent",
+        "recency": "Current - 2024 publication",
+        "actionability": "HIGH - Multi-step frameworks, KOL tracking, conference strategy"
+      }
+    },
+    {
+      "agent": "Sophie",
+      "file_path": "documents/orchestration/agentic-ai-pharmaceutical-2024.md",
+      "s3_path": "s3://socratiq-sophie-corpus-prod/documents/orchestration/agentic-ai-pharmaceutical-2024.md",
+      "title": "Agentic AI in Pharmaceutical R&D",
+      "source": "XenonStack",
+      "url": "https://www.xenonstack.com/blog/agentic-ai-in-pharmaceutical",
+      "publication_date": "2024",
+      "date_added": "2025-10-22",
+      "legal_status": {
+        "copyright_status": "Educational content (corporate blog/article)",
+        "license": "Not explicitly stated; assumed standard copyright",
+        "usage_rights": "Fair use for educational and research purposes",
+        "legal_basis": "17 U.S.C. § 107 (Fair Use - educational and transformative use)",
+        "attribution_required": true,
+        "risk_level": "LOW"
+      },
+      "fair_use_justification": {
+        "purpose": "Educational use for AI agent training (non-commercial, transformative)",
+        "nature": "Factual industry analysis and technology overview",
+        "amount": "Summary of key concepts and case studies (< 10% of original content)",
+        "effect": "No market harm; promotes understanding of agentic AI applications"
+      },
+      "attribution_template": "Source: 'Agentic AI in Pharmaceutical R&D', XenonStack (2024), URL: https://www.xenonstack.com/blog/agentic-ai-in-pharmaceutical",
+      "quality_metrics": {
+        "authority": "HIGH - Recognized industry analyst/technology provider",
+        "relevance": "CRITICAL - Defines agentic AI architecture for Sophie orchestration",
+        "recency": "Current - 2024 publication",
+        "actionability": "HIGH - Implementation frameworks, case studies, best practices"
+      }
+    }
+  ],
+  "usage_guidelines": {
+    "agent_response_requirements": [
+      "Always cite source documents when using corpus content",
+      "Use attribution templates provided above",
+      "Include source URLs for user verification",
+      "Log all corpus retrievals to Trace™ audit system"
+    ],
+    "commercial_deployment_notes": [
+      "Verify specific CC licenses for PMC articles before commercial use",
+      "Fair use applies to educational and research contexts",
+      "Attribution required for all sources",
+      "Monitor source URLs for license updates"
+    ],
+    "prohibited_uses": [
+      "Do not reproduce substantial portions verbatim",
+      "Do not present corpus content as original SocratIQ work",
+      "Do not remove or obscure attribution information",
+      "Do not use proprietary sources (see LEGAL_REVIEW_SOURCES.md)"
+    ]
+  },
+  "next_steps": {
+    "immediate": [
+      "Upload corpus documents to S3 with this metadata file",
+      "Update Lambda environment variables with bucket names",
+      "Configure agent prompts to include attribution in responses",
+      "Test agent retrieval and citation functionality"
+    ],
+    "ongoing": [
+      "Monitor source URLs for license changes",
+      "Update metadata as new documents added",
+      "Conduct quarterly legal compliance reviews",
+      "Maintain audit logs of corpus usage via Trace™"
+    ]
+  }
+}

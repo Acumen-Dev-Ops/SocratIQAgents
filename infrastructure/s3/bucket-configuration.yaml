@@ -1,0 +1,325 @@
+# SocratIQ Agent Corpus S3 Bucket Configuration
+# CloudFormation Template for Agent Knowledge Base Storage
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'SocratIQ Platform - Agent Corpus S3 Buckets for VERA, FINN, NORA, CLIA, Sophie'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: prod
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+    Description: Environment name for bucket naming
+
+  EnableVersioning:
+    Type: String
+    Default: 'true'
+    AllowedValues:
+      - 'true'
+      - 'false'
+    Description: Enable S3 versioning for all buckets
+
+  EnableEncryption:
+    Type: String
+    Default: 'true'
+    AllowedValues:
+      - 'true'
+      - 'false'
+    Description: Enable AES-256 encryption at rest
+
+Resources:
+  # VERA Agent Corpus Bucket
+  VERACorpusBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'socratiq-vera-corpus-${Environment}'
+      VersioningConfiguration:
+        Status: !If [EnableVersioningCondition, Enabled, Suspended]
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Id: TransitionToIA
+            Status: Enabled
+            Transitions:
+              - StorageClass: STANDARD_IA
+                TransitionInDays: 90
+          - Id: DeleteOldVersions
+            Status: Enabled
+            NoncurrentVersionExpirationInDays: 365
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Agent
+          Value: VERA
+        - Key: Purpose
+          Value: Pharmaceutical Product and Clinical Intelligence Corpus
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # FINN Agent Corpus Bucket
+  FINNCorpusBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'socratiq-finn-corpus-${Environment}'
+      VersioningConfiguration:
+        Status: !If [EnableVersioningCondition, Enabled, Suspended]
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Id: TransitionToIA
+            Status: Enabled
+            Transitions:
+              - StorageClass: STANDARD_IA
+                TransitionInDays: 90
+          - Id: DeleteOldVersions
+            Status: Enabled
+            NoncurrentVersionExpirationInDays: 365
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Agent
+          Value: FINN
+        - Key: Purpose
+          Value: Financial and Investment Intelligence Corpus
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # NORA Agent Corpus Bucket
+  NORACorpusBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'socratiq-nora-corpus-${Environment}'
+      VersioningConfiguration:
+        Status: !If [EnableVersioningCondition, Enabled, Suspended]
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Id: TransitionToIA
+            Status: Enabled
+            Transitions:
+              - StorageClass: STANDARD_IA
+                TransitionInDays: 90
+          - Id: DeleteOldVersions
+            Status: Enabled
+            NoncurrentVersionExpirationInDays: 365
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Agent
+          Value: NORA
+        - Key: Purpose
+          Value: Legal Regulatory and IP Intelligence Corpus
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # CLIA Agent Corpus Bucket
+  CLIACorpusBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'socratiq-clia-corpus-${Environment}'
+      VersioningConfiguration:
+        Status: !If [EnableVersioningCondition, Enabled, Suspended]
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Id: TransitionToIA
+            Status: Enabled
+            Transitions:
+              - StorageClass: STANDARD_IA
+                TransitionInDays: 90
+          - Id: DeleteOldVersions
+            Status: Enabled
+            NoncurrentVersionExpirationInDays: 365
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Agent
+          Value: CLIA
+        - Key: Purpose
+          Value: Clinical Trials and Market Intelligence Corpus
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # Sophie Agent Corpus Bucket
+  SophieCorpusBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'socratiq-sophie-corpus-${Environment}'
+      VersioningConfiguration:
+        Status: !If [EnableVersioningCondition, Enabled, Suspended]
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Id: TransitionToIA
+            Status: Enabled
+            Transitions:
+              - StorageClass: STANDARD_IA
+                TransitionInDays: 90
+          - Id: DeleteOldVersions
+            Status: Enabled
+            NoncurrentVersionExpirationInDays: 365
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Agent
+          Value: Sophie
+        - Key: Purpose
+          Value: Strategic Orchestration and Decision Synthesis Corpus
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # IAM Policy for Lambda Functions to Access Corpus Buckets
+  AgentCorpusAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub 'SocratIQ-AgentCorpusAccess-${Environment}'
+      Description: Allow Lambda functions to read from agent corpus buckets
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: ListBuckets
+            Effect: Allow
+            Action:
+              - s3:ListBucket
+              - s3:GetBucketLocation
+            Resource:
+              - !GetAtt VERACorpusBucket.Arn
+              - !GetAtt FINNCorpusBucket.Arn
+              - !GetAtt NORACorpusBucket.Arn
+              - !GetAtt CLIACorpusBucket.Arn
+              - !GetAtt SophieCorpusBucket.Arn
+          - Sid: ReadObjects
+            Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:GetObjectVersion
+            Resource:
+              - !Sub '${VERACorpusBucket.Arn}/*'
+              - !Sub '${FINNCorpusBucket.Arn}/*'
+              - !Sub '${NORACorpusBucket.Arn}/*'
+              - !Sub '${CLIACorpusBucket.Arn}/*'
+              - !Sub '${SophieCorpusBucket.Arn}/*'
+          - Sid: WriteObjects
+            Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:PutObjectAcl
+            Resource:
+              - !Sub '${VERACorpusBucket.Arn}/*'
+              - !Sub '${FINNCorpusBucket.Arn}/*'
+              - !Sub '${NORACorpusBucket.Arn}/*'
+              - !Sub '${CLIACorpusBucket.Arn}/*'
+              - !Sub '${SophieCorpusBucket.Arn}/*'
+
+Conditions:
+  EnableVersioningCondition: !Equals [!Ref EnableVersioning, 'true']
+
+Outputs:
+  VERACorpusBucketName:
+    Description: VERA Agent Corpus Bucket Name
+    Value: !Ref VERACorpusBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-VERA-Corpus-Bucket'
+
+  VERACorpusBucketArn:
+    Description: VERA Agent Corpus Bucket ARN
+    Value: !GetAtt VERACorpusBucket.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-VERA-Corpus-Bucket-Arn'
+
+  FINNCorpusBucketName:
+    Description: FINN Agent Corpus Bucket Name
+    Value: !Ref FINNCorpusBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-FINN-Corpus-Bucket'
+
+  FINNCorpusBucketArn:
+    Description: FINN Agent Corpus Bucket ARN
+    Value: !GetAtt FINNCorpusBucket.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-FINN-Corpus-Bucket-Arn'
+
+  NORACorpusBucketName:
+    Description: NORA Agent Corpus Bucket Name
+    Value: !Ref NORACorpusBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-NORA-Corpus-Bucket'
+
+  NORACorpusBucketArn:
+    Description: NORA Agent Corpus Bucket ARN
+    Value: !GetAtt NORACorpusBucket.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-NORA-Corpus-Bucket-Arn'
+
+  CLIACorpusBucketName:
+    Description: CLIA Agent Corpus Bucket Name
+    Value: !Ref CLIACorpusBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-CLIA-Corpus-Bucket'
+
+  CLIACorpusBucketArn:
+    Description: CLIA Agent Corpus Bucket ARN
+    Value: !GetAtt CLIACorpusBucket.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-CLIA-Corpus-Bucket-Arn'
+
+  SophieCorpusBucketName:
+    Description: Sophie Agent Corpus Bucket Name
+    Value: !Ref SophieCorpusBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-Sophie-Corpus-Bucket'
+
+  SophieCorpusBucketArn:
+    Description: Sophie Agent Corpus Bucket ARN
+    Value: !GetAtt SophieCorpusBucket.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-Sophie-Corpus-Bucket-Arn'
+
+  AgentCorpusAccessPolicyArn:
+    Description: IAM Policy ARN for Agent Corpus Access
+    Value: !Ref AgentCorpusAccessPolicy
+    Export:
+      Name: !Sub '${AWS::StackName}-AgentCorpusAccessPolicy-Arn'
