@@ -27,11 +27,12 @@ import {
 const lambdaClient = new LambdaClient({ region: process.env.AWS_REGION || 'us-east-1' });
 
 // Environment variables for agent Lambda ARNs
-const AGENT_ARNS = {
+const AGENT_ARNS: Record<AgentName, string> = {
   VERA: process.env.VERA_LAMBDA_ARN || '',
   FINN: process.env.FINN_LAMBDA_ARN || '',
   NORA: process.env.NORA_LAMBDA_ARN || '',
-  CLIA: process.env.CLIA_LAMBDA_ARN || ''
+  CLIA: process.env.CLIA_LAMBDA_ARN || '',
+  Sophie: '' // Sophie doesn't invoke itself
 };
 
 /**
@@ -323,7 +324,7 @@ async function synthesizeResponses(params: {
   const allSources = aggregateSources(agentResponses);
 
   // Build agent contributions summary
-  const agentContributions: Record<AgentName, string> = {};
+  const agentContributions: Partial<Record<AgentName, string>> = {};
   for (const response of agentResponses) {
     agentContributions[response.agent] = response.response.substring(0, 300) + '...';
   }
