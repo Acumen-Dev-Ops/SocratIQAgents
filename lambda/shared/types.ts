@@ -126,7 +126,7 @@ export interface SophieSynthesis {
   probabilisticRisk?: string;
   confidence: number;
   sources: SourceCitation[];
-  agentContributions: Record<AgentName, string>;
+  agentContributions: Partial<Record<AgentName, string>>;
   traceId: string;
   conflicts?: string[];
   timestamp: string;
