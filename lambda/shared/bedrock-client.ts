@@ -9,7 +9,7 @@ const bedrockClient = new BedrockRuntimeClient({
 });
 
 // Bedrock model configuration
-const MODEL_ID = 'anthropic.claude-3-5-sonnet-20241022-v2:0';
+const MODEL_ID = process.env.BEDROCK_MODEL_ID || 'us.anthropic.claude-3-5-sonnet-20241022-v2:0';
 const DEFAULT_MAX_TOKENS = 4096;
 const DEFAULT_TEMPERATURE = 0.1;
 
