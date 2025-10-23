@@ -73,7 +73,13 @@ st.markdown("""
 # Initialize AWS Lambda client
 @st.cache_resource
 def get_lambda_client():
-    return boto3.client('lambda', region_name='us-east-1')
+    from botocore.config import Config
+    config = Config(
+        read_timeout=300,  # 5 minutes to match Lambda timeout
+        connect_timeout=10,
+        retries={'max_attempts': 0}
+    )
+    return boto3.client('lambda', region_name='us-east-1', config=config)
 
 lambda_client = get_lambda_client()
 
