@@ -2,7 +2,7 @@
   "extends": "../../shared/tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "../.."
+    "rootDir": "../../"
   },
   "include": ["./**/*.ts", "../../shared/**/*.ts"],
   "exclude": ["node_modules", "dist"]

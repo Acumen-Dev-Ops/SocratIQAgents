@@ -80,44 +80,44 @@ cd ../..
 rm -rf lambda/shared/nodejs
 echo "✓ Shared layer packaged"
 
-# Package VERA
-cd lambda/agents/vera/dist
-cp -r ../../../shared/dist/* .
-cp -r ../../../shared/node_modules .
-zip -r -q ../../../../vera-agent.zip .
-cd ../../../..
+# Package VERA - new structure: dist/agents/vera/index.js and dist/shared/*.js
+cd lambda/agents/vera/dist/agents/vera
+cp -r ../../../../shared/node_modules .
+cp -r ../../../shared ./shared
+zip -r -q ../../../../../../vera-agent.zip . shared/
+cd ../../../../../..
 echo "✓ VERA packaged"
 
 # Package FINN
-cd lambda/agents/finn/dist
-cp -r ../../../shared/dist/* .
-cp -r ../../../shared/node_modules .
-zip -r -q ../../../../finn-agent.zip .
-cd ../../../..
+cd lambda/agents/finn/dist/agents/finn
+cp -r ../../../../shared/node_modules .
+cp -r ../../../shared ./shared
+zip -r -q ../../../../../../finn-agent.zip . shared/
+cd ../../../../../..
 echo "✓ FINN packaged"
 
 # Package NORA
-cd lambda/agents/nora/dist
-cp -r ../../../shared/dist/* .
-cp -r ../../../shared/node_modules .
-zip -r -q ../../../../nora-agent.zip .
-cd ../../../..
+cd lambda/agents/nora/dist/agents/nora
+cp -r ../../../../shared/node_modules .
+cp -r ../../../shared ./shared
+zip -r -q ../../../../../../nora-agent.zip . shared/
+cd ../../../../../..
 echo "✓ NORA packaged"
 
 # Package CLIA
-cd lambda/agents/clia/dist
-cp -r ../../../shared/dist/* .
-cp -r ../../../shared/node_modules .
-zip -r -q ../../../../clia-agent.zip .
-cd ../../../..
+cd lambda/agents/clia/dist/agents/clia
+cp -r ../../../../shared/node_modules .
+cp -r ../../../shared ./shared
+zip -r -q ../../../../../../clia-agent.zip . shared/
+cd ../../../../../..
 echo "✓ CLIA packaged"
 
 # Package Sophie
-cd lambda/agents/sophie/dist
-cp -r ../../../shared/dist/* .
-cp -r ../../../shared/node_modules .
-zip -r -q ../../../../sophie-orchestrator.zip .
-cd ../../../..
+cd lambda/agents/sophie/dist/agents/sophie
+cp -r ../../../../shared/node_modules .
+cp -r ../../../shared ./shared
+zip -r -q ../../../../../../sophie-orchestrator.zip . shared/
+cd ../../../../../..
 echo "✓ Sophie packaged"
 echo ""
 
@@ -141,57 +141,48 @@ echo "✓ Sophie uploaded"
 echo ""
 
 echo "Step 10: Deploying CloudFormation stack..."
-cd infrastructure/lambda
-
-# Check if stack exists
-if aws cloudformation describe-stacks --stack-name ${STACK_NAME} --region ${AWS_REGION} 2>&1 | grep -q 'does not exist'; then
+if aws cloudformation describe-stacks --stack-name ${STACK_NAME} --region ${AWS_REGION} &>/dev/null; then
+    echo "Updating existing stack..."
+    aws cloudformation update-stack \
+        --stack-name ${STACK_NAME} \
+        --template-body file://infrastructure/lambda/agent-lambdas.yaml \
+        --region ${AWS_REGION} \
+        --capabilities CAPABILITY_IAM \
+        --parameters \
+            ParameterKey=Environment,ParameterValue=prod \
+            ParameterKey=S3CodeBucket,ParameterValue=${S3_CODE_BUCKET}
+    
+    echo "Waiting for stack update..."
+    aws cloudformation wait stack-update-complete \
+        --stack-name ${STACK_NAME} \
+        --region ${AWS_REGION}
+    echo "✓ Stack updated successfully"
+else
     echo "Creating new stack..."
     aws cloudformation create-stack \
         --stack-name ${STACK_NAME} \
-        --template-body file://agent-lambdas.yaml \
-        --parameters ParameterKey=Environment,ParameterValue=prod \
-        --capabilities CAPABILITY_NAMED_IAM \
-        --region ${AWS_REGION}
-
+        --template-body file://infrastructure/lambda/agent-lambdas.yaml \
+        --region ${AWS_REGION} \
+        --capabilities CAPABILITY_IAM \
+        --parameters \
+            ParameterKey=Environment,ParameterValue=prod \
+            ParameterKey=S3CodeBucket,ParameterValue=${S3_CODE_BUCKET}
+    
     echo "Waiting for stack creation (this takes 5-7 minutes)..."
     aws cloudformation wait stack-create-complete \
         --stack-name ${STACK_NAME} \
         --region ${AWS_REGION}
-
     echo "✓ Stack created successfully"
-else
-    echo "Updating existing stack..."
-    aws cloudformation update-stack \
-        --stack-name ${STACK_NAME} \
-        --template-body file://agent-lambdas.yaml \
-        --parameters ParameterKey=Environment,ParameterValue=prod \
-        --capabilities CAPABILITY_NAMED_IAM \
-        --region ${AWS_REGION} 2>&1 || true
-
-    echo "Waiting for stack update..."
-    aws cloudformation wait stack-update-complete \
-        --stack-name ${STACK_NAME} \
-        --region ${AWS_REGION} 2>&1 || true
-
-    echo "✓ Stack updated successfully"
 fi
-
-cd ../..
 echo ""
 
 echo "================================================"
 echo "✓ DEPLOYMENT COMPLETE!"
 echo "================================================"
 echo ""
-
 echo "Lambda Function ARNs:"
-aws cloudformation describe-stacks \
-    --stack-name ${STACK_NAME} \
-    --region ${AWS_REGION} \
-    --query 'Stacks[0].Outputs[?contains(OutputKey, `LambdaArn`)].{Agent:OutputKey,ARN:OutputValue}' \
-    --output table
-
 echo ""
+
 echo "Next Steps:"
 echo "1. Test VERA: aws lambda invoke --function-name SocratIQ-VERA-Agent-prod --payload '{\"query\":\"What enrollment strategy for Phase 3?\"}' response.json"
 echo "2. Test Sophie: aws lambda invoke --function-name SocratIQ-Sophie-Orchestrator-prod --payload '{\"message\":\"Should I pursue CRADA?\"}' response.json"
