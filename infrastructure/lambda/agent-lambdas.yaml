@@ -11,6 +11,11 @@ Parameters:
       - prod
     Description: Environment name
 
+  S3CodeBucket:
+    Type: String
+    Default: 'socratiq-lambda-code-prod'
+    Description: S3 bucket containing Lambda deployment packages
+
   BedrockModelId:
     Type: String
     Default: 'anthropic.claude-3-5-sonnet-20241022-v2:0'
