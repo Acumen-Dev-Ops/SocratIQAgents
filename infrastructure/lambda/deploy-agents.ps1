@@ -176,9 +176,5 @@ Write-Host "3. Monitor CloudWatch logs for any errors"
 Write-Host "4. Update API Gateway to point to Sophie Lambda"
 Write-Host ""
 Write-Host "Lambda Function ARNs:" -ForegroundColor Yellow
-aws cloudformation describe-stacks `
-    --stack-name $STACK_NAME `
-    --region $AWS_REGION `
-    --query 'Stacks[0].Outputs[?OutputKey==`VERALambdaArn` || OutputKey==`FINNLambdaArn` || OutputKey==`NORALambdaArn` || OutputKey==`CLIALambdaArn` || OutputKey==`SophieLambdaArn`].{Agent:OutputKey,ARN:OutputValue}' `
-    --output table
+aws cloudformation describe-stacks --stack-name $STACK_NAME --region $AWS_REGION --query "Stacks[0].Outputs[?OutputKey=='VERALambdaArn' || OutputKey=='FINNLambdaArn' || OutputKey=='NORALambdaArn' || OutputKey=='CLIALambdaArn' || OutputKey=='SophieLambdaArn'].{Agent:OutputKey,ARN:OutputValue}" --output table
 Write-Host ""

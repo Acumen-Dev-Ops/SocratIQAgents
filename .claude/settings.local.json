@@ -1,15 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mkdir:*)",
-      "Bash(tree:*)",
-      "Bash(aws:*)",
-      "Bash(git init:*)",
-      "Bash(git add:*)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nComplete SocratIQ multi-agent collaboration framework deployment\n\nInfrastructure & Architecture:\n- Deploy 5 S3 corpus buckets with legal compliance framework\n- Create CloudFormation template for multi-agent Lambda functions\n- Design complete multi-agent collaboration architecture\n- Implement IAM roles and permissions for agent coordination\n\nAgent Framework:\n- Create comprehensive skills documentation (133 pages total)\n  - VERA: Product & Clinical Intelligence (26 pages, 6 sub-agents)\n  - FINN: Financial & Investment Intelligence (25 pages, 6 sub-agents)\n  - NORA: Legal, Regulatory & IP Intelligence (27 pages, 6 sub-agents)\n  - CLIA: Clinical Trials & Market Intelligence (24 pages, 5 sub-agents)\n  - Sophie: Strategic Orchestration Engine (31 pages, tri-paradigm reasoning)\n\nCorpus & Legal Compliance:\n- Research and document 52 authoritative best practice sources\n- Download 4 priority corpus documents with legal metadata\n- Complete legal review (all sources approved for use)\n- Upload corpus documents to S3 with attribution metadata\n- Create cross-reference documents mapping 36 sources to agent capabilities\n\nDeployment Plan:\n- 6-day dual-team implementation sprint documented\n- Complete code templates for all Lambda functions\n- Testing strategy and success criteria defined\n- Risk mitigation and performance targets established\n\nAWS Infrastructure Deployed:\n- socratiq-vera-corpus-prod (2 files, 14.6 KiB)\n- socratiq-finn-corpus-prod (2 files, 17.6 KiB)\n- socratiq-nora-corpus-prod (1 file, 8.5 KiB)\n- socratiq-clia-corpus-prod (2 files, 18.9 KiB)\n- socratiq-sophie-corpus-prod (2 files, 18.8 KiB)\n- SocratIQ-AgentCorpusAccess-prod IAM policy\n\nDocumentation:\n- MULTI_AGENT_ARCHITECTURE.md (467 lines)\n- agent-lambdas.yaml CloudFormation template (403 lines)\n- AGENT_DEPLOYMENT_PLAN.md (661 lines)\n- MULTI_AGENT_DEPLOYMENT_SUMMARY.md (comprehensive overview)\n- DEPLOYMENT_COMPLETE.md (S3 corpus deployment summary)\n- LEGAL_REVIEW_SOURCES.md (52 sources legal analysis)\n- BEST_PRACTICES_MASTER_INDEX.md (complete source catalog)\n\nStatus: Architecture complete, ready for 6-day implementation sprint\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git commit:*)"
-    ],
-    "deny": [],
-    "ask": []
+      "Bash(npm install:*)",
+      "Bash(bash:*)",
+      "Bash(git push:*)"
+    ]
   }
 }
