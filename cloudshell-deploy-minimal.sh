@@ -70,39 +70,44 @@ echo ""
 
 echo "Step 7: Packaging Lambda functions (minimal - no node_modules)..."
 
-# Package VERA - minimal: just compiled code
-cd lambda/agents/vera/dist/agents/vera
-cp -r ../../shared ./
-zip -r -q ../../../../../../vera-agent.zip . shared/
-cd ../../../../../..
+# Package VERA - copy shared into dist, then zip from dist
+mkdir -p lambda/agents/vera/dist/shared
+cp -r lambda/shared/dist/* lambda/agents/vera/dist/shared/
+cd lambda/agents/vera/dist
+zip -r -q ../../../vera-agent.zip .
+cd ../../..
 echo "✓ VERA packaged"
 
 # Package FINN
-cd lambda/agents/finn/dist/agents/finn
-cp -r ../../shared ./
-zip -r -q ../../../../../../finn-agent.zip . shared/
-cd ../../../../../..
+mkdir -p lambda/agents/finn/dist/shared
+cp -r lambda/shared/dist/* lambda/agents/finn/dist/shared/
+cd lambda/agents/finn/dist
+zip -r -q ../../../finn-agent.zip .
+cd ../../..
 echo "✓ FINN packaged"
 
 # Package NORA
-cd lambda/agents/nora/dist/agents/nora
-cp -r ../../shared ./
-zip -r -q ../../../../../../nora-agent.zip . shared/
-cd ../../../../../..
+mkdir -p lambda/agents/nora/dist/shared
+cp -r lambda/shared/dist/* lambda/agents/nora/dist/shared/
+cd lambda/agents/nora/dist
+zip -r -q ../../../nora-agent.zip .
+cd ../../..
 echo "✓ NORA packaged"
 
 # Package CLIA
-cd lambda/agents/clia/dist/agents/clia
-cp -r ../../shared ./
-zip -r -q ../../../../../../clia-agent.zip . shared/
-cd ../../../../../..
+mkdir -p lambda/agents/clia/dist/shared
+cp -r lambda/shared/dist/* lambda/agents/clia/dist/shared/
+cd lambda/agents/clia/dist
+zip -r -q ../../../clia-agent.zip .
+cd ../../..
 echo "✓ CLIA packaged"
 
 # Package Sophie
-cd lambda/agents/sophie/dist/agents/sophie
-cp -r ../../shared ./
-zip -r -q ../../../../../../sophie-orchestrator.zip . shared/
-cd ../../../../../..
+mkdir -p lambda/agents/sophie/dist/shared
+cp -r lambda/shared/dist/* lambda/agents/sophie/dist/shared/
+cd lambda/agents/sophie/dist
+zip -r -q ../../../sophie-orchestrator.zip .
+cd ../../..
 echo "✓ Sophie packaged"
 echo ""
 
