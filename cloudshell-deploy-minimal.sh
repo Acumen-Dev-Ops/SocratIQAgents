@@ -130,7 +130,7 @@ if aws cloudformation describe-stacks --stack-name ${STACK_NAME} --region ${AWS_
         --stack-name ${STACK_NAME} \
         --template-body file://infrastructure/lambda/agent-lambdas.yaml \
         --region ${AWS_REGION} \
-        --capabilities CAPABILITY_IAM \
+        --capabilities CAPABILITY_NAMED_IAM \
         --parameters \
             ParameterKey=Environment,ParameterValue=prod \
             ParameterKey=S3CodeBucket,ParameterValue=${S3_CODE_BUCKET}
@@ -146,7 +146,7 @@ else
         --stack-name ${STACK_NAME} \
         --template-body file://infrastructure/lambda/agent-lambdas.yaml \
         --region ${AWS_REGION} \
-        --capabilities CAPABILITY_IAM \
+        --capabilities CAPABILITY_NAMED_IAM \
         --parameters \
             ParameterKey=Environment,ParameterValue=prod \
             ParameterKey=S3CodeBucket,ParameterValue=${S3_CODE_BUCKET}
