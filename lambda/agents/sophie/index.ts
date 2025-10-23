@@ -78,17 +78,25 @@ export async function handler(event: any): Promise<any> {
       pattern: agentPlan.invocationPattern
     });
 
-    // Step 2: Invoke agents based on plan
-    const agentResponses = await invokeAgents(agentPlan, {
-      query: userQuery,
-      assetContext,
-      traceId
-    });
+    // Step 2: Check if Sophie should respond directly (no agents needed)
+    let agentResponses: AgentResponse[] = [];
 
-    logInfo('Agent responses received', {
-      traceId,
-      responseCount: agentResponses.length
-    });
+    if (agentPlan.agents.length === 0 || agentPlan.invocationPattern === 'none') {
+      logInfo('Sophie responding directly without invoking agents', { traceId });
+      // Sophie will synthesize with empty agent responses - she'll answer from her own knowledge
+    } else {
+      // Invoke agents based on plan
+      agentResponses = await invokeAgents(agentPlan, {
+        query: userQuery,
+        assetContext,
+        traceId
+      });
+
+      logInfo('Agent responses received', {
+        traceId,
+        responseCount: agentResponses.length
+      });
+    }
 
     // Step 3: Synthesize using tri-paradigm reasoning
     const synthesis = await synthesizeResponses({
