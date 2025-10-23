@@ -52,8 +52,8 @@ Resources:
                   - bedrock:InvokeModel
                   - bedrock:InvokeModelWithResponseStream
                 Resource:
-                  - !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/*'
-                  - !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*'
+                  - 'arn:aws:bedrock:*::foundation-model/*'
+                  - !Sub 'arn:aws:bedrock:*:${AWS::AccountId}:inference-profile/*'
         - PolicyName: S3CorpusAccess
           PolicyDocument:
             Version: '2012-10-17'
@@ -109,8 +109,8 @@ Resources:
                   - bedrock:InvokeModel
                   - bedrock:InvokeModelWithResponseStream
                 Resource:
-                  - !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/*'
-                  - !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*'
+                  - 'arn:aws:bedrock:*::foundation-model/*'
+                  - !Sub 'arn:aws:bedrock:*:${AWS::AccountId}:inference-profile/*'
         - PolicyName: SecretsManagerAccess
           PolicyDocument:
             Version: '2012-10-17'
