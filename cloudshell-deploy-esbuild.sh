@@ -22,7 +22,11 @@ echo ""
 for AGENT in vera finn nora clia sophie; do
     echo "Building $AGENT..."
     cd lambda/agents/$AGENT
+    
+    # CLEAN dist folder first!
+    rm -rf dist
     mkdir -p dist
+    
     npx esbuild index.ts \
         --bundle \
         --platform=node \
@@ -83,8 +87,9 @@ echo "================================================"
 echo "✓ DEPLOYMENT COMPLETE!"
 echo "================================================"
 echo ""
-echo "Waiting 10 seconds for functions to become active..."
-sleep 10
+echo "Waiting 15 seconds for functions to become active..."
+sleep 15
 echo ""
-echo "Test with:"
-echo "aws lambda invoke --function-name SocratIQ-CLIA-Agent-prod --cli-binary-format raw-in-base64-out --payload '{\"query\":\"What are the phases of clinical trials?\"}' test.json && cat test.json"
+echo "Testing CLIA agent..."
+aws lambda invoke --function-name SocratIQ-CLIA-Agent-prod --cli-binary-format raw-in-base64-out --payload '{"query":"What are the phases of clinical trials?"}' test.json > /dev/null && cat test.json
+echo ""
