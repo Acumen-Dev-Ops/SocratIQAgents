@@ -12,9 +12,10 @@ echo ""
 AWS_REGION="us-east-1"
 S3_CODE_BUCKET="socratiq-lambda-code-prod"
 
-# Install esbuild globally
+# Install esbuild locally
 echo "Installing esbuild..."
-npm install -g esbuild
+npm install esbuild
+export PATH="./node_modules/.bin:$PATH"
 echo ""
 
 # Build each agent with esbuild (bundles everything into single index.js)
@@ -22,7 +23,7 @@ for AGENT in vera finn nora clia sophie; do
     echo "Building $AGENT..."
     cd lambda/agents/$AGENT
     mkdir -p dist
-    esbuild index.ts \
+    npx esbuild index.ts \
         --bundle \
         --platform=node \
         --target=node20 \
