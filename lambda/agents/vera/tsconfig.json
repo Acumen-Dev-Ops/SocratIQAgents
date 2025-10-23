@@ -5,9 +5,9 @@
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "./shared/*": ["../../shared/dist/*"]
+      "./shared/*": ["../../shared/*"]
     }
   },
-  "include": ["./**/*.ts"],
+  "include": ["./**/*.ts", "../../shared/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
