@@ -72,35 +72,35 @@ echo "Step 7: Packaging Lambda functions (minimal - no node_modules)..."
 
 # Package VERA - minimal: just compiled code
 cd lambda/agents/vera/dist/agents/vera
-cp -r ../../../shared ./
+cp -r ../../shared ./
 zip -r -q ../../../../../../vera-agent.zip . shared/
 cd ../../../../../..
 echo "✓ VERA packaged"
 
 # Package FINN
 cd lambda/agents/finn/dist/agents/finn
-cp -r ../../../shared ./
+cp -r ../../shared ./
 zip -r -q ../../../../../../finn-agent.zip . shared/
 cd ../../../../../..
 echo "✓ FINN packaged"
 
 # Package NORA
 cd lambda/agents/nora/dist/agents/nora
-cp -r ../../../shared ./
+cp -r ../../shared ./
 zip -r -q ../../../../../../nora-agent.zip . shared/
 cd ../../../../../..
 echo "✓ NORA packaged"
 
 # Package CLIA
 cd lambda/agents/clia/dist/agents/clia
-cp -r ../../../shared ./
+cp -r ../../shared ./
 zip -r -q ../../../../../../clia-agent.zip . shared/
 cd ../../../../../..
 echo "✓ CLIA packaged"
 
 # Package Sophie
 cd lambda/agents/sophie/dist/agents/sophie
-cp -r ../../../shared ./
+cp -r ../../shared ./
 zip -r -q ../../../../../../sophie-orchestrator.zip . shared/
 cd ../../../../../..
 echo "✓ Sophie packaged"
