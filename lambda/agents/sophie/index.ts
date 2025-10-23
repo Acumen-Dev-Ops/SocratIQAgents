@@ -4,15 +4,15 @@
 // Created: October 22, 2025
 
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
-import { invokeClaude, invokeClaudeForClassification } from './shared/bedrock-client';
-import { AGENT_SYSTEM_PROMPTS, SOPHIE_CLASSIFICATION_PROMPT } from './shared/agent-prompts';
+import { invokeClaude, invokeClaudeForClassification } from '../../shared/bedrock-client';
+import { AGENT_SYSTEM_PROMPTS, SOPHIE_CLASSIFICATION_PROMPT } from '../../shared/agent-prompts';
 import {
   AgentName,
   AgentPlan,
   AgentResponse,
   SophieSynthesis,
   SourceCitation
-} from './shared/types';
+} from '../../shared/types';
 import {
   generateTraceId,
   parseLambdaEvent,
@@ -22,7 +22,7 @@ import {
   logInfo,
   logError,
   checkRequiredEnvVars
-} from './shared/utils';
+} from '../../shared/utils';
 
 const lambdaClient = new LambdaClient({ region: process.env.AWS_REGION || 'us-east-1' });
 

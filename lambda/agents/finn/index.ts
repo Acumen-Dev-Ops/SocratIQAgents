@@ -3,15 +3,15 @@
 // Domain: Financial Analysis & Valuation
 // Created: October 22, 2025
 
-import { retrieveFromCorpus } from './shared/corpus-retrieval';
-import { invokeClaude } from './shared/bedrock-client';
-import { AGENT_SYSTEM_PROMPTS } from './shared/agent-prompts';
+import { retrieveFromCorpus } from '../../shared/corpus-retrieval';
+import { invokeClaude } from '../../shared/bedrock-client';
+import { AGENT_SYSTEM_PROMPTS } from '../../shared/agent-prompts';
 import {
   AgentRequest,
   AgentResponse,
   FINNSubAgent,
   CorpusDocument
-} from './shared/types';
+} from '../../shared/types';
 import {
   generateTraceId,
   parseLambdaEvent,
@@ -20,7 +20,7 @@ import {
   logInfo,
   logError,
   checkRequiredEnvVars
-} from './shared/utils';
+} from '../../shared/utils';
 
 const CORPUS_BUCKET = process.env.FINN_CORPUS_BUCKET || 'socratiq-finn-corpus-prod';
 
