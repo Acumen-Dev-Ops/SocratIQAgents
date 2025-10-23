@@ -155,7 +155,7 @@ Resources:
       Environment:
         Variables:
           AGENT_NAME: VERA
-          CORPUS_BUCKET: !Sub 'socratiq-vera-corpus-${Environment}'
+          VERA_CORPUS_BUCKET: !Sub 'socratiq-vera-corpus-${Environment}'
           BEDROCK_MODEL_ID: !Ref BedrockModelId
           REGION: !Ref AWS::Region
           ENVIRONMENT: !Ref Environment
@@ -192,7 +192,7 @@ Resources:
       Environment:
         Variables:
           AGENT_NAME: FINN
-          CORPUS_BUCKET: !Sub 'socratiq-finn-corpus-${Environment}'
+          FINN_CORPUS_BUCKET: !Sub 'socratiq-finn-corpus-${Environment}'
           BEDROCK_MODEL_ID: !Ref BedrockModelId
           REGION: !Ref AWS::Region
           ENVIRONMENT: !Ref Environment
@@ -229,7 +229,7 @@ Resources:
       Environment:
         Variables:
           AGENT_NAME: NORA
-          CORPUS_BUCKET: !Sub 'socratiq-nora-corpus-${Environment}'
+          NORA_CORPUS_BUCKET: !Sub 'socratiq-nora-corpus-${Environment}'
           BEDROCK_MODEL_ID: !Ref BedrockModelId
           REGION: !Ref AWS::Region
           ENVIRONMENT: !Ref Environment
@@ -266,7 +266,7 @@ Resources:
       Environment:
         Variables:
           AGENT_NAME: CLIA
-          CORPUS_BUCKET: !Sub 'socratiq-clia-corpus-${Environment}'
+          CLIA_CORPUS_BUCKET: !Sub 'socratiq-clia-corpus-${Environment}'
           BEDROCK_MODEL_ID: !Ref BedrockModelId
           REGION: !Ref AWS::Region
           ENVIRONMENT: !Ref Environment
@@ -307,7 +307,7 @@ Resources:
           FINN_LAMBDA_ARN: !GetAtt FINNAgentFunction.Arn
           NORA_LAMBDA_ARN: !GetAtt NORAAgentFunction.Arn
           CLIA_LAMBDA_ARN: !GetAtt CLIAAgentFunction.Arn
-          CORPUS_BUCKET: !Sub 'socratiq-sophie-corpus-${Environment}'
+          SOPHIE_CORPUS_BUCKET: !Sub 'socratiq-sophie-corpus-${Environment}'
           BEDROCK_MODEL_ID: !Ref BedrockModelId
           DB_SECRET_ARN: !Ref DBSecretArn
           REGION: !Ref AWS::Region
