@@ -85,9 +85,18 @@ export async function handler(event: any): Promise<any> {
       logInfo('Sophie responding directly without invoking agents', { traceId });
       // Sophie will synthesize with empty agent responses - she'll answer from her own knowledge
     } else {
-      // Invoke agents based on plan
-      agentResponses = await invokeAgents(agentPlan, {
-        query: userQuery,
+      // Step 2a: Create execution plan with specific tasks for each agent
+      logInfo('Creating detailed execution plan for agents', { traceId });
+      const executionPlan = await createExecutionPlan(userQuery, agentPlan, traceId);
+
+      logInfo('Execution plan created', {
+        traceId,
+        agentTasks: executionPlan.agentTasks
+      });
+
+      // Step 2b: Invoke agents with their specific assigned tasks
+      agentResponses = await invokeAgentsWithPlan(executionPlan, {
+        userQuery,
         assetContext,
         traceId
       });
@@ -205,7 +214,85 @@ function fallbackClassification(query: string): AgentPlan {
 }
 
 /**
- * Invoke agents based on the plan (parallel or sequential)
+ * Create detailed execution plan with specific tasks for each agent
+ */
+async function createExecutionPlan(
+  userQuery: string,
+  agentPlan: AgentPlan,
+  traceId: string
+): Promise<{ agentTasks: Record<AgentName, string>; invocationPattern: string }> {
+  const planningPrompt = `You are Sophie, the strategic orchestrator. The user asked: "${userQuery}"
+
+You will coordinate these agents: ${agentPlan.agents.join(', ')}
+
+For each agent, create a SPECIFIC, TARGETED task that leverages their expertise. Don't just send them the user's question - give them a clear, focused assignment.
+
+Agent Capabilities:
+- VERA: Product formulation, clinical trial design, biomarkers, CMC/manufacturing, partnerships
+- FINN: Financial modeling (rNPV, IRR), deal valuation, pricing strategy, ROI analysis
+- NORA: Regulatory pathways (505b2, BLA), FDA strategy, patent landscape, IP protection
+- CLIA: Market analysis, epidemiology, competitive intelligence, trial operations, timelines
+
+Respond with JSON only:
+{
+  "VERA": "Analyze the product formulation requirements for...",
+  "FINN": "Calculate the risk-adjusted NPV considering...",
+  "NORA": "Evaluate regulatory pathway options for...",
+  "CLIA": "Assess the competitive landscape and market opportunity for..."
+}
+
+Only include agents from this list: ${agentPlan.agents.join(', ')}
+Be specific and actionable in each task assignment.`;
+
+  try {
+    const result = await invokeClaude({
+      systemPrompt: 'You are a strategic task decomposition specialist. Create clear, specific tasks for domain experts.',
+      userMessage: planningPrompt,
+      maxTokens: 1024,
+      temperature: 0.3
+    });
+
+    const agentTasks = JSON.parse(result.content);
+
+    return {
+      agentTasks,
+      invocationPattern: agentPlan.invocationPattern
+    };
+  } catch (error) {
+    logError('Execution plan creation failed, using fallback', error, { traceId });
+
+    // Fallback: use the original query for all agents
+    const fallbackTasks: Record<string, string> = {};
+    for (const agent of agentPlan.agents) {
+      fallbackTasks[agent] = userQuery;
+    }
+
+    return {
+      agentTasks: fallbackTasks as Record<AgentName, string>,
+      invocationPattern: agentPlan.invocationPattern
+    };
+  }
+}
+
+/**
+ * Invoke agents with their specific assigned tasks
+ */
+async function invokeAgentsWithPlan(
+  executionPlan: { agentTasks: Record<AgentName, string>; invocationPattern: string },
+  context: { userQuery: string; assetContext?: any; traceId: string }
+): Promise<AgentResponse[]> {
+  const agents = Object.keys(executionPlan.agentTasks) as AgentName[];
+
+  if (executionPlan.invocationPattern === 'parallel') {
+    return invokeAgentsParallelWithTasks(executionPlan.agentTasks, context);
+  } else {
+    return invokeAgentsSequentialWithTasks(executionPlan.agentTasks, agents, context);
+  }
+}
+
+/**
+ * Invoke agents based on the plan (parallel or sequential) - DEPRECATED
+ * Kept for backwards compatibility
  */
 async function invokeAgents(
   plan: AgentPlan,
@@ -247,6 +334,59 @@ async function invokeAgentsSequential(
     const response = await invokeSingleAgent(agent, {
       query: context.query,
       assetContext: context.assetContext,
+      previousResponses: responses
+    });
+
+    if (response) {
+      responses.push(response);
+    }
+  }
+
+  return responses;
+}
+
+/**
+ * Invoke multiple agents in parallel with specific tasks
+ */
+async function invokeAgentsParallelWithTasks(
+  agentTasks: Record<AgentName, string>,
+  context: { userQuery: string; assetContext?: any; traceId: string }
+): Promise<AgentResponse[]> {
+  const invocations = Object.entries(agentTasks).map(([agent, task]) =>
+    invokeSingleAgent(agent as AgentName, {
+      query: task,
+      assetContext: context.assetContext,
+      originalQuery: context.userQuery
+    })
+  );
+
+  const results = await Promise.all(invocations);
+  return results.filter(r => r !== null) as AgentResponse[];
+}
+
+/**
+ * Invoke agents sequentially with specific tasks
+ */
+async function invokeAgentsSequentialWithTasks(
+  agentTasks: Record<AgentName, string>,
+  agents: AgentName[],
+  context: { userQuery: string; assetContext?: any; traceId: string }
+): Promise<AgentResponse[]> {
+  const responses: AgentResponse[] = [];
+
+  for (const agent of agents) {
+    const task = agentTasks[agent];
+    if (!task) continue;
+
+    // Include previous agent responses for context
+    const contextualTask = responses.length > 0
+      ? `${task}\n\nContext from previous agents:\n${responses.map(r => `${r.agent}: ${r.response.substring(0, 500)}...`).join('\n\n')}`
+      : task;
+
+    const response = await invokeSingleAgent(agent, {
+      query: contextualTask,
+      assetContext: context.assetContext,
+      originalQuery: context.userQuery,
       previousResponses: responses
     });
 
